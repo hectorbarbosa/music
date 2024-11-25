@@ -1,0 +1,305 @@
+definitions:
+  models.Song:
+    properties:
+      group:
+        description: Group name
+        example: Muse
+        type: string
+      id:
+        example: 1
+        type: integer
+      link:
+        description: URL link
+        example: http://example.org
+        type: string
+      name:
+        description: Song name
+        example: Supermassive Black Hole
+        type: string
+      releaseDate:
+        description: Release date in 02.01.2006 format
+        example: 16.07.2006
+        type: string
+      text:
+        description: Song text
+        example: |
+          Some text
+        type: string
+    required:
+    - group
+    - link
+    - name
+    - releaseDate
+    - text
+    type: object
+  models.SongDetails:
+    properties:
+      group:
+        description: Group name
+        example: Muse
+        type: string
+      song:
+        description: Song name
+        example: Supermassive Black Hole
+        type: string
+    required:
+    - group
+    - song
+    type: object
+  models.UpdateParams:
+    properties:
+      group_name:
+        description: Group name
+        example: Muse
+        type: string
+      link:
+        description: URL link
+        example: http://example.org
+        type: string
+      release_date:
+        description: Release date in 02.01.2006 format
+        example: 16.07.2006
+        type: string
+      song_name:
+        description: Song name
+        example: Supermassive Black Hole
+        type: string
+      song_text:
+        description: Song text
+        example: |
+          Some text
+
+           Some text2
+        type: string
+    required:
+    - group_name
+    - link
+    - release_date
+    - song_name
+    - song_text
+    type: object
+  models.Verse:
+    properties:
+      num:
+        description: verse number
+        example: "1"
+        type: string
+      text:
+        description: verse text
+        example: |
+          Some text
+        type: string
+    type: object
+  rest.ErrorResponse:
+    properties:
+      error:
+        description: Error string
+        example: error description
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample music service.
+  title: Swagger Songs
+  version: "1.0"
+paths:
+  /songs:
+    post:
+      consumes:
+      - application/json
+      description: Create new record
+      parameters:
+      - description: input data
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/models.SongDetails'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Song'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      tags:
+      - Фонотека
+  /songs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete record
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      tags:
+      - Фонотека
+    put:
+      consumes:
+      - application/json
+      description: Update record
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: input data
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/models.Song'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      tags:
+      - Фонотека
+  /songs/{id}/verse/{vid}:
+    get:
+      consumes:
+      - application/json
+      description: Получить куплет песни
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Номер куплета, начиная с 1
+        in: path
+        name: vid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/models.Verse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      tags:
+      - Фонотека
+  /songs/page/{page_num}/records/{per_page}:
+    get:
+      consumes:
+      - application/json
+      description: Поиск по фонотеке
+      parameters:
+      - description: Page number from 0
+        in: path
+        name: page_num
+        required: true
+        type: integer
+      - description: Records per page
+        in: path
+        name: per_page
+        required: true
+        type: integer
+      - description: Searching group name
+        in: query
+        name: group_name
+        type: string
+      - description: Song name
+        in: query
+        name: song_name
+        type: string
+      - description: Release date (example 17.06.2006)
+        in: query
+        name: release_date
+        type: string
+      - description: Song text
+        in: query
+        name: song_text
+        type: string
+      - description: Link
+        in: query
+        name: link
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            items:
+              $ref: '#/definitions/models.Song'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/rest.ErrorResponse'
+      tags:
+      - Фонотека
+schemes:
+- http
+swagger: "2.0"
